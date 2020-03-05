@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Console;
+using static System.Threading.Tasks.Parallel;
 
 namespace MyEBookReader
 {
@@ -11,11 +12,11 @@ namespace MyEBookReader
     {
         private static string theEBook = "";
 
-        static void Main(string[] args)
+        static void Main()
         {
             GetBook();
-            Console.WriteLine("Downloading book...");
-            Console.ReadLine();
+            WriteLine("Downloading book...");
+            ReadLine();
         }
 
         static void GetBook()
@@ -24,7 +25,7 @@ namespace MyEBookReader
             wc.DownloadStringCompleted += (s, eArgs) =>
             {
                 theEBook = eArgs.Result;
-                Console.WriteLine("Download complete.");
+                WriteLine("Download complete.");
                 GetStats();
             };
             // The Project Gutenberg EBook of A Tale of Two Cities, by Charles Dickens
@@ -40,17 +41,13 @@ namespace MyEBookReader
             string[] tenMostCommon = null;
             string longestWord = string.Empty;
 
-            Parallel.Invoke(
+            Invoke(
                 () =>
-                {
                     // Now, find the ten most common words.
-                    tenMostCommon = FindTenMostCommon(words);
-                },
+                    tenMostCommon = FindTenMostCommon(words),
                 () =>
-                {
                     // Get the longest word. 
-                    longestWord = FindLongestWord(words);
-                });
+                    longestWord = FindLongestWord(words));
 
             // Now that all tasks are complete, build a string to show all stats.
             StringBuilder bookStats = new StringBuilder("Ten Most Common Words are:\n");
@@ -58,9 +55,9 @@ namespace MyEBookReader
             {
                 bookStats.AppendLine(s);
             }
-            bookStats.AppendFormat("Longest word is: {0}", longestWord);
+            bookStats.AppendFormat($"Longest word is: {longestWord}");
             bookStats.AppendLine();
-            Console.WriteLine(bookStats.ToString(), "Book info");
+            WriteLine(bookStats.ToString(), "Book info");
         }
         static string[] FindTenMostCommon(string[] words)
         {
